@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私藏时序｜个人收藏与时令备忘录</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 提醒弹窗样式 */
+        .remind-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .remind-modal-box {
+            background: #fff;
+            padding: 24px;
+            border-radius: 12px;
+            width: 360px;
+        }
+
+        .remind-modal-box h4 {
+            margin-top: 0;
+            color: #9c1a2c;
+        }
+
+        .remind-row {
+            margin: 16px 0;
+        }
+
+        .remind-modal-box button {
+            margin-top: 10px;
+            padding: 6px 16px;
+            cursor: pointer;
+        }
+
+        /* 邮箱设置样式 */
+        .email-setting {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f9f5f0;
+            border-radius: 8px;
+            border-left: 4px solid #9c1a2c;
+        }
+
+        .email-setting h5 {
+            margin-top: 0;
+            color: #9c1a2c;
+            font-size: 16px;
+        }
+
+        .email-setting input[type="email"] {
+            padding: 8px;
+            width: 220px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .email-setting button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+        }
+
+        .btn-save {
+            background: #9c1a2c;
+            color: white;
+        }
+
+        .email-status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .status-ok {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-none {
+            background: #ff9800;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 新增静态预埋后台链接，默认隐藏，不会和悬浮窗脚本冲突 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="user-top">
+            <h2 class="block-title">私藏时序 · 用户中心 & 民族记忆馆</h2>
+        </section>
+
+        <div class="user-tab">
+            <button class="user-tab-btn active" data-tab="collect">我的收藏节日/非遗</button>
+            <button class="user-tab-btn" data-tab="remind-list">时令提醒备忘录</button>
+            <button class="user-tab-btn" data-tab="ai-record">AI会话历史存档</button>
+            <button class="user-tab-btn" data-tab="setting">消息通知设置</button>
+            <button class="user-tab-btn" data-tab="account">当前登录</button>
+            <button class="user-tab-btn" id="logout-btn">退出登录</button>
+        </div>
+
+        <section class="user-content active" id="collect">
+            <h4>收藏管理（非遗、节庆统一存放）</h4>
+            <div id="collect-wrap"></div>
+        </section>
+
+        <section class="user-content" id="remind-list">
+            <h4>时令备忘录（记忆馆）</h4>
+            <div id="remind-wrap"></div>
+        </section>
+
+        <section class="user-content" id="ai-record">
+            <h4>AI对话历史&生成文案存档</h4>
+            <div id="ai-record-wrap"></div>
+        </section>
+
+        <section class="user-content" id="setting">
+            <h4>推送通知设置</h4>
+
+            <div class="email-setting">
+                <h5>📧 邮箱配置（用于接收节日提醒邮件）</h5>
+                <p>当前邮箱：<span id="current-email">未设置</span></p>
+                <div style="margin-top: 10px;">
+                    <input type="email" id="email-input" placeholder="请输入QQ邮箱，如：123456@qq.com">
+                    <button class="btn-save" onclick="saveEmail()">保存邮箱</button>
+                </div>
+                <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                    <i class="fas fa-info-circle"></i>
+                    请确保邮箱正确，否则无法收到节日提醒邮件
+                </p>
+            </div>
+
+            <label><input type="checkbox" id="switch-browser">开启浏览器节日桌面推送</label><br>
+            <label><input type="checkbox" id="switch-email">开启节日、非遗科普邮件推送</label>
+        </section>
+
+        <section class="user-content" id="account">
+            <h4>账号注册基本信息</h4>
+            <div class="user-info">
+                <i class="fas fa-user-circle" style="font-size: 48px; color: #9c1a2c;"></i>
+                <div>
+                    <p>用户名：<span id="show-name">游客</span></p>
+                    <p>绑定手机号：<span id="show-phone">未填写</span></p>
+                    <p>绑定邮箱：<span id="show-email">未填写</span></p>
+                </div>
+            </div>
+            <hr style="margin:20px 0;">
+            <h4>修改登录密码</h4>
+            <p>旧密码：<input type="password" id="oldPwd"></p>
+            <p>新密码：<input type="password" id="newPwd"></p>
+            <p>确认密码：<input type="password" id="rePwd"></p>
+            <button id="savePwd">保存修改</button>
+        </section>
+    </main>
+
+    <div class="remind-modal" id="remindModal">
+        <div class="remind-modal-box">
+            <h4>设置节日提醒</h4>
+            <input type="hidden" id="editRemindIndex" value="">
+            <div class="remind-row">
+                <label>提前提醒天数：</label>
+                <select id="remindDay">
+                    <option value="1">提前1天</option>
+                    <option value="3">提前3天</option>
+                    <option value="7" selected>提前7天</option>
+                    <option value="15">提前15天</option>
+                </select>
+            </div>
+            <div class="remind-row">
+                <label>每日提醒时间：</label>
+                <input type="time" id="remindTime" value="09:00">
+            </div>
+            <button id="saveRemindBtn">保存配置</button>
+            <button id="closeRemindModal">取消</button>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+        let festData = [];
+        const showName = document.getElementById('show-name');
+        const showPhone = document.getElementById('show-phone');
+        const showEmail = document.getElementById('show-email');
+        const logoutBtn = document.getElementById('logout-btn');
+        const collectWrap = document.getElementById('collect-wrap');
+        const remindWrap = document.getElementById('remind-wrap');
+        const aiRecordWrap = document.getElementById('ai-record-wrap');
+        const remindModal = document.getElementById('remindModal');
+        const editRemindIndex = document.getElementById('editRemindIndex');
+        const remindDay = document.getElementById('remindDay');
+        const remindTime = document.getElementById('remindTime');
+        const saveRemindBtn = document.getElementById('saveRemindBtn');
+        const closeRemindModal = document.getElementById('closeRemindModal');
+
+        closeRemindModal.onclick = () => remindModal.style.display = 'none';
+
+        function syncUserToList(userInfo) {
+            if (!userInfo || !userInfo.username) return;
+            let userList = JSON.parse(localStorage.getItem('userList') || '[]');
+            const userIndex = userList.findIndex(u => u.username === userInfo.username);
+            if (userIndex > -1) {
+                userList[userIndex] = userInfo;
+                localStorage.setItem('userList', JSON.stringify(userList));
+            }
+        }
+
+        function getCurrentUser() {
+            const userStr = localStorage.getItem('nowUser');
+            if (!userStr) return {};
+            return JSON.parse(userStr);
+        }
+
+        window.onload = async function () {
+            // 执行导航文字切换
+            updateLoginNav();
+
+            const loginUser = localStorage.getItem('loginUser');
+            if (!loginUser) {
+                alert("请先登录账号");
+                location.href = "login.html";
+                return;
+            }
+            await loadFestData();
+            initLoginState();
+            // 登录自动回填注册邮箱到输入框
+            const user = getCurrentUser();
+            const inputDom = document.getElementById('email-input');
+            if (user.email && inputDom.value === "") {
+                inputDom.value = user.email;
+            }
+            renderCollect();
+            renderRemind();
+            renderAiRecord();
+            initEmailSetting();
+
+            // 导航点击拦截
+            const userNavBtn = document.getElementById('userNavBtn');
+            userNavBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const loginUser = localStorage.getItem('loginUser');
+                if (!loginUser) {
+                    alert('请先登录账号');
+                    location.href = "login.html";
+                }
+            });
+        }
+
+        function initLoginState() {
+            const userInfo = getCurrentUser();
+            const loginName = localStorage.getItem('loginUser');
+            showName.innerText = loginName || '未知用户';
+            showPhone.innerText = userInfo.phone || '未填写';
+            showEmail.innerText = userInfo.email || '未填写';
+        }
+
+        function initEmailSetting() {
+            const userInfo = getCurrentUser();
+            const emailSpan = document.getElementById('current-email');
+            const emailInput = document.getElementById('email-input');
+            if (userInfo.email) {
+                emailSpan.innerHTML = userInfo.email + ' <span class="email-status status-ok">已设置</span>';
+                emailInput.value = userInfo.email;
+            } else {
+                emailSpan.innerHTML = '未设置 <span class="email-status status-none">未设置</span>';
+            }
+        }
+
+        window.saveEmail = function () {
+            const emailInput = document.getElementById('email-input');
+            const email = emailInput.value.trim();
+            if (!email) {
+                alert("请输入邮箱地址");
+                return;
+            }
+            if (!email.includes('@') || !email.includes('.')) {
+                alert("请输入有效的邮箱地址");
+                return;
+            }
+            let userInfo = getCurrentUser();
+            userInfo.email = email;
+            localStorage.setItem('nowUser', JSON.stringify(userInfo));
+            syncUserToList(userInfo);
+            fetch('http://localhost:5000/api/user/email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: userInfo.username,
+                    email: email
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        initEmailSetting();
+                        initLoginState();
+                        alert("邮箱保存成功！");
+                    } else {
+                        alert("保存失败：" + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error('保存邮箱失败:', err);
+                    initEmailSetting();
+                    initLoginState();
+                    alert("邮箱已本地保存（后端连接失败）");
+                });
+        }
+
+        document.getElementById('savePwd').onclick = function () {
+            let old = document.getElementById('oldPwd').value.trim();
+            let new1 = document.getElementById('newPwd').value.trim();
+            let re = document.getElementById('rePwd').value.trim();
+            if (!old || !new1 || !re) {
+                alert("密码输入框不能为空");
+                return;
+            }
+            if (new1.length < 6) {
+                alert("新密码长度至少6位");
+                return;
+            }
+            let userInfo = getCurrentUser();
+            if (!userInfo.password) {
+                alert("用户信息获取失败，请重新登录");
+                return;
+            }
+            if (old !== userInfo.password) {
+                alert("原密码输入错误！");
+                return;
+            }
+            if (new1 !== re) {
+                alert("两次新密码不一致！");
+                return;
+            }
+            if (old === new1) {
+                alert("新密码不能与旧密码相同");
+                return;
+            }
+            userInfo.password = new1;
+            localStorage.setItem('nowUser', JSON.stringify(userInfo));
+            syncUserToList(userInfo);
+            alert("密码修改成功");
+            document.getElementById('oldPwd').value = "";
+            document.getElementById('newPwd').value = "";
+            document.getElementById('rePwd').value = "";
+        };
+
+        logoutBtn.addEventListener('click', () => {
+            if (!confirm("确定退出账号吗？")) return;
+            localStorage.removeItem('loginUser');
+            localStorage.removeItem('nowUser');
+            location.href = "login.html";
+        });
+
+        async function loadFestData() {
+            try {
+                const res = await fetch("js/festival.json");
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                festData = await res.json();
+            } catch (error) {
+                console.error("加载节日数据失败:", error);
+                festData = [];
+            }
+        }
+
+        function renderCollect() {
+            collectWrap.innerHTML = "";
+            const user = getCurrentUser();
+            let collectArr = Array.isArray(user.collect) ? user.collect : [];
+            if (collectArr.length === 0) {
+                collectWrap.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-heart"></i>
+                        <p>暂无收藏内容</p>
+                        <p style="font-size: 12px; margin-top: 8px;">快去"时序历馆"或"百族图谱"探索收藏吧</p>
+                    </div>
+                `;
+                return;
+            }
+            collectArr.forEach(item => {
+                let festival = null;
+                if (typeof item === 'number' || /^\d+$/.test(item)) {
+                    festival = festData.find(f => String(f.id) === String(item));
+                }
+                if (!festival) {
+                    festival = festData.find(f => f.name === item);
+                }
+                if (!festival) {
+                    console.warn('未找到节日:', item);
+                    return;
+                }
+                const card = document.createElement('div');
+                card.className = 'fest-card';
+                card.innerHTML = `
+                    <h5 style="margin: 0 0 8px; color: #702020;">${festival.name}</h5>
+                    <p style="margin: 0; color: #666; font-size: 13px;">${festival.time || '时间待定'}</p>
+                    <button class="remove-btn" onclick="removeCollect('${item}')">
+                        <i class="fas fa-trash-alt"></i> 取消收藏
+                    </button>
+                `;
+                collectWrap.appendChild(card);
+            });
+        }
+
+        function removeCollect(item) {
+            if (!confirm('确定取消收藏该节日吗？')) return;
+            let userInfo = getCurrentUser();
+            if (!Array.isArray(userInfo.collect)) return;
+            userInfo.collect = userInfo.collect.filter(i => i !== item);
+            localStorage.setItem('nowUser', JSON.stringify(userInfo));
+            syncUserToList(userInfo);
+            renderCollect();
+            alert('已取消收藏');
+        }
+
+        window.openRemindModal = function (index) {
+            const user = getCurrentUser();
+            const remindItem = user.remind[index];
+            editRemindIndex.value = index;
+            remindDay.value = remindItem.remindDay || 7;
+            remindTime.value = remindItem.remindTime || "09:00";
+            remindModal.style.display = 'flex';
+        }
+
+        saveRemindBtn.onclick = function () {
+            const idx = Number(editRemindIndex.value);
+            const day = remindDay.value;
+            const time = remindTime.value;
+            let userInfo = getCurrentUser();
+            userInfo.remind[idx].remindDay = day;
+            userInfo.remind[idx].remindTime = time;
+            localStorage.setItem('nowUser', JSON.stringify(userInfo));
+            syncUserToList(userInfo);
+            remindModal.style.display = 'none';
+            renderRemind();
+            alert("提醒设置保存成功");
+        }
+
+        function renderRemind() {
+            remindWrap.innerHTML = "";
+            const user = getCurrentUser();
+            let remindList = Array.isArray(user.remind) ? user.remind : [];
+            if (remindList.length === 0) {
+                remindWrap.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-bell"></i>
+                        <p>暂无提醒</p>
+                    </div>
+                `;
+                return;
+            }
+            remindList.forEach((item, index) => {
+                let dateText = item.date ? item.date : "无日期";
+                let rDay = item.remindDay || 7;
+                let rTime = item.remindTime || "09:00";
+                const card = document.createElement('div');
+                card.className = 'fest-card';
+                card.innerHTML = `
+                    <h5 style="margin: 0 0 8px;">${item.name}</h5>
+                    <p style="margin: 0; color: #666; font-size: 13px;">日期：${dateText}</p>
+                    <p style="margin: 4px 0; color: #666; font-size: 13px;">提醒：提前${rDay}天 ${rTime}推送</p>
+                    <div style="display:flex; gap:8px; margin-top:8px;">
+                        <button class="remove-btn" onclick="openRemindModal(${index})">
+                            <i class="fas fa-cog"></i> 设置提醒
+                        </button>
+                        <button class="remove-btn" onclick="removeRemind(${index})">
+                            <i class="fas fa-trash-alt"></i> 删除提醒
+                        </button>
+                    </div>
+                `;
+                remindWrap.appendChild(card);
+            });
+        }
+
+        function removeRemind(index) {
+            if (!confirm('确定删除该提醒吗？')) return;
+            let userInfo = getCurrentUser();
+            if (!Array.isArray(userInfo.remind)) return;
+            userInfo.remind.splice(index, 1);
+            localStorage.setItem('nowUser', JSON.stringify(userInfo));
+            syncUserToList(userInfo);
+            renderRemind();
+        }
+
+        function renderAiRecord() {
+            aiRecordWrap.innerHTML = "";
+            let chatList = JSON.parse(localStorage.getItem('ai_nation_chat_history') || '[]');
+            if (chatList.length === 0) {
+                aiRecordWrap.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-comments"></i>
+                        <p>暂无对话记录</p>
+                    </div>
+                `;
+                return;
+            }
+            chatList.forEach(msg => {
+                const card = document.createElement('div');
+                card.className = 'fest-card';
+                if (msg.sender === 'user') {
+                    card.style.marginLeft = "auto";
+                    card.style.background = "#e7f3ff";
+                } else {
+                    card.style.marginRight = "auto";
+                    card.style.background = "#f8f9fa";
+                }
+                card.style.maxWidth = "80%";
+                card.style.width = "fit-content";
+                let name = msg.sender === 'user' ? '我' : 'AI助手';
+                let icon = msg.sender === 'user' ? 'fas fa-user' : 'fas fa-robot';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 13px;">
+                        <i class="${icon}"></i>
+                        <strong>${name}</strong>
+                    </div>
+                    <p style="margin:0;line-height:1.6;">${msg.text}</p>
+                `;
+                aiRecordWrap.appendChild(card);
+            });
+        }
+
+        const tabBtns = document.querySelectorAll('.user-tab-btn');
+        const tabContents = document.querySelectorAll('.user-content');
+        tabBtns.forEach(btn => {
+            btn.onclick = function () {
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            }
+        });
+    </script>
+    <!-- 管理员导航控制JS，仅控制显示隐藏 -->
+    <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+});
+    </script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+</html>

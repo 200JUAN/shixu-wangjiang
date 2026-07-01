@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>风物叙录｜非遗民俗百科</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --main-red: #9c1a2c;
+            --light-red: #f8e9eb;
+            --text-dark: #333;
+            --border-color: #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg?t=20260627" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html" class="active">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 静态预埋后台管理链接，默认隐藏，原生跳转不受脚本拦截 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <section class="culture-top">
+        <h2 class="block-title">风物叙录 · 节庆非遗瑰宝 & 民族百科</h2>
+    </section>
+
+    <div class="user-tab">
+        <button class="user-tab-btn active" data-tab="craft">非遗工艺（非遗瑰宝）</button>
+        <button class="user-tab-btn" data-tab="food">节庆美食（民族百科）</button>
+        <button class="user-tab-btn" data-tab="dance">民族歌舞（非遗瑰宝）</button>
+    </div>
+
+    <section class="user-content active" id="craft">
+        <div class="culture-card">
+            <h4>苗绣</h4>
+            <p>苗族节日盛装核心刺绣纹样，承载节庆图腾文化，国家级非物质文化遗产</p>
+            <button class="enter-btn" style="margin-top:10px;"><i class="fa-solid fa-star"></i> 收藏非遗项目</button>
+        </div>
+        <div class="culture-card">
+            <h4>侗族银饰锻造技艺</h4>
+            <p>三月三、萨玛节传统配饰锻造工艺，非遗手工技艺</p>
+            <button class="enter-btn" style="margin-top:10px;"><i class="fa-solid fa-star"></i> 收藏非遗项目</button>
+        </div>
+        <div class="culture-card">
+            <h4>水族马尾绣</h4>
+            <p>端节祭祀服饰专属工艺，国家级非遗，独有水族民俗符号</p>
+            <button class="enter-btn" style="margin-top:10px;"><i class="fa-solid fa-star"></i> 收藏非遗项目</button>
+        </div>
+    </section>
+
+    <section class="user-content" id="food">
+        <div class="culture-card">
+            <h4>布依族五色糯米饭</h4>
+            <p>三月三祭祀必备节庆主食，植物天然染色，承载祈福寓意</p>
+        </div>
+        <div class="culture-card">
+            <h4>苗年长桌宴酸汤鱼</h4>
+            <p>苗年待客核心宴席菜品，苗族节庆标志性饮食</p>
+        </div>
+        <div class="culture-card">
+            <h4>水族鱼包韭菜</h4>
+            <p>端节祭祖专属宴席美食，记录水族迁徙历史传说</p>
+        </div>
+    </section>
+
+    <section class="user-content" id="dance">
+        <div class="culture-card">
+            <h4>侗族大歌</h4>
+            <p>萨玛节千人无伴奏合唱，世界级非遗，多声部原生态民歌</p>
+            <button class="enter-btn" style="margin-top:10px;"><i class="fa-solid fa-star"></i> 收藏非遗项目</button>
+        </div>
+        <div class="culture-card">
+            <h4>彝族火把节芦笙舞</h4>
+            <p>火把节篝火集体传统舞蹈，节庆民俗核心表演形式</p>
+            <button class="enter-btn" style="margin-top:10px;"><i class="fa-solid fa-star"></i> 收藏非遗项目</button>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    // 执行导航文字切换
+    updateLoginNav();
+
+    // 导航点击拦截校验
+    const userNavBtn = document.getElementById('userNavBtn');
+    userNavBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const loginUser = localStorage.getItem('loginUser');
+        if (!loginUser) {
+            alert('请先登录账号');
+        }
+    });
+});
+    </script>
+    <!-- 管理员导航控制JS，仅控制显示隐藏 -->
+    <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+});
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+
+</html>

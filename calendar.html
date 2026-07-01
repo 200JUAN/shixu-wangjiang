@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时序历馆｜多民族岁时万年历</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 已移除lunar.min.js引入，不再需要农历转换库 -->
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg?t=20260627" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 静态预埋后台管理链接，默认隐藏，原生跳转不受脚本拦截 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <section class="calendar-top">
+        <h2 class="block-title">循疆觅时·多民族双历法数字日历（民族大观）</h2>
+        <div class="filter-box">
+            <select id="nationSelect">
+                <option value="all">全部民族</option>
+                <option value="miao">苗族</option>
+                <option value="buyi">布依族</option>
+                <option value="dong">侗族</option>
+                <option value="shui">水族</option>
+                <option value="yi">彝族</option>
+                <option value="yao">瑶族</option>
+                <option value="gelao">仡佬族</option>
+                <option value="tujia">土家族</option>
+                <option value="zhuang">壮族</option>
+                <option value="hui">回族</option>
+                <option value="bai">白族</option>
+                <option value="she">畲族</option>
+                <option value="maonan">毛南族</option>
+                <option value="mulao">仫佬族</option>
+                <option value="man">满族</option>
+                <option value="mong">蒙古族</option>
+                <option value="qiang">羌族</option>
+            </select>
+            <button class="tab-btn active" data-tab="listTab">全年节庆列表视图</button>
+            <button class="tab-btn" data-tab="monthTab">月历视图</button>
+        </div>
+    </section>
+
+    <div id="listTab" class="tab-content active">
+        <div class="festival-wrap" id="listWrap"></div>
+    </div>
+
+    <div id="monthTab" class="tab-content">
+        <div class="calendar-box" id="monthWrap"></div>
+    </div>
+
+    <div class="fest-modal" id="fest-modal">
+        <div style="position:fixed;inset:0;" onclick="event.stopPropagation()"></div>
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <span class="close-modal">&times;</span>
+            <img id="modal-img" src="" alt="节日图片">
+            <h3 id="modal-name"></h3>
+            <p>举办时间：<span id="modal-time"></span></p>
+            <p id="modal-desc"></p>
+            <div class="modal-btn-group">
+                <button id="collect-btn">收藏此节日</button>
+                <button id="remind-btn">添加节日提醒</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 导航文字、链接动态切换逻辑
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+let festData = [];
+let targetNationParam = "all";
+let currentFestId = "";
+
+async function loadFestData() {
+    try {
+        const res = await fetch("js/festival.json");
+        festData = await res.json();
+        filterFestivalByNation(targetNationParam);
+    } catch (err) {
+        console.error("加载节日数据失败:", err);
+    }
+}
+
+function getUrlParam(name) {
+    let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+    let r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]);
+    return null;
+}
+
+function syncUserToList(userInfo) {
+    if (!userInfo || !userInfo.username) return;
+    let userList = JSON.parse(localStorage.getItem('userList') || '[]');
+    const userIndex = userList.findIndex(u => u.username === userInfo.username);
+    if (userIndex > -1) {
+        userList[userIndex] = userInfo;
+        localStorage.setItem('userList', JSON.stringify(userList));
+    }
+}
+
+function filterFestivalByNation(nationKey) {
+    const wrap = document.getElementById("listWrap");
+    wrap.innerHTML = "";
+    let list = festData;
+    if (nationKey !== "all") {
+        list = festData.filter(item => item.nation === nationKey);
+    }
+    list.forEach(fest => {
+        // 直接读取JSON里写死好的完整农历+公历文本，无需转换
+        const showTime = fest.time;
+        const card = document.createElement("div");
+        card.className = "fest-card";
+        card.innerHTML = `
+            <img src="${fest.img}" alt="${fest.name}">
+            <h5>${fest.name}</h5>
+            <p>${fest.nation}</p>
+            <p style="font-size:13px;color:#555;">举办时间：${showTime}</p>
+        `;
+        card.onclick = () => openModal(fest);
+        wrap.appendChild(card);
+    });
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+    // 执行导航文字切换
+    updateLoginNav();
+
+    let param = getUrlParam("nation");
+    if (param) targetNationParam = param;
+    await loadFestData();
+    const nationSelect = document.getElementById("nationSelect");
+    if (nationSelect && param) nationSelect.value = param;
+    nationSelect.onchange = function () {
+        targetNationParam = this.value;
+        filterFestivalByNation(targetNationParam);
+    }
+
+    // 导航点击拦截
+    const userNavBtn = document.getElementById('userNavBtn');
+    userNavBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const loginUser = localStorage.getItem('loginUser');
+        if (loginUser) {
+            location.href = "user.html";
+        } else {
+            alert('请先登录账号');
+            location.href = "login.html";
+        }
+    });
+
+    const modal = document.getElementById('fest-modal');
+    function openModal(fest) {
+        currentFestId = String(fest.id);
+        document.getElementById('modal-img').src = fest.img;
+        document.getElementById('modal-name').innerText = fest.name;
+        document.getElementById('modal-time').innerText = fest.time;
+        document.getElementById('modal-desc').innerText = fest.desc;
+        modal.style.display = "block";
+    }
+    document.querySelector('.close-modal').onclick = () => modal.style.display = "none";
+
+    const collectBtn = document.getElementById('collect-btn');
+    collectBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        document.getElementById('fest-modal').style.display = "none";
+        const loginUser = localStorage.getItem('loginUser');
+        if (!loginUser) {
+            alert("请先登录账号再收藏！");
+            location.href = "login.html";
+            return;
+        }
+        let userInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+        if (!Array.isArray(userInfo.collect)) userInfo.collect = [];
+        if (userInfo.collect.includes(currentFestId)) {
+            alert("该节日已收藏，无需重复操作");
+            return;
+        }
+        userInfo.collect.push(currentFestId);
+        localStorage.setItem('nowUser', JSON.stringify(userInfo));
+        syncUserToList(userInfo);
+        alert("收藏成功，可前往私藏时序查看");
+    });
+
+    // 完整保留邮件发送提醒逻辑
+    const remindBtn = document.getElementById('remind-btn');
+    remindBtn.addEventListener('click', async function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        document.getElementById('fest-modal').style.display = "none";
+        const loginUser = localStorage.getItem('loginUser');
+        if (!loginUser) {
+            alert("请先登录账号再添加提醒！");
+            location.href = "login.html";
+            return;
+        }
+        let userInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+        if (!userInfo.email) {
+            alert("请先完善邮箱信息！");
+            location.href = "user.html";
+            return;
+        }
+        const festival = festData.find(f => String(f.id) === String(currentFestId));
+        if (!festival) {
+            alert("节日信息获取失败");
+            return;
+        }
+        const exists = userInfo.remind && userInfo.remind.some(item => String(item.id) === String(currentFestId));
+        if (exists) {
+            alert("该节日提醒已存在");
+            return;
+        }
+        const lunarOnly = festival.time.split("（")[0];
+        try {
+            const res = await fetch('http://localhost:5000/api/remind', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    username: userInfo.username,
+                    email: userInfo.email,
+                    id: festival.id,
+                    name: festival.name,
+                    date: lunarOnly,
+                    remindDay: "7",
+                    remindTime: "09:00",
+                    note: ''
+                })
+            })
+            const data = await res.json();
+            if(data.status==='success'){
+                if(!Array.isArray(userInfo.remind)) userInfo.remind=[];
+                userInfo.remind.push({
+                    id:String(festival.id),
+                    name:festival.name,
+                    date:festival.time,
+                    remindDay:"7",
+                    remindTime:"09:00",
+                    note:''
+                });
+                localStorage.setItem('nowUser', JSON.stringify(userInfo));
+                syncUserToList(userInfo);
+                alert("预约提醒添加成功，节日将至邮件通知");
+            }else {
+                alert(data.msg || "添加提醒失败");
+            }
+        } catch (err) {
+            console.error('邮件接口请求失败',err);
+            alert("网络错误，请检查后端服务是否运行");
+        }
+    });
+});
+    </script>
+    <!-- 新增管理员导航控制JS，仅控制显示隐藏，无点击冲突 -->
+    <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+});
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+
+</html>

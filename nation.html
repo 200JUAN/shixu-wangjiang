@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百族图谱｜各民族人文档案</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 临时内嵌样式，直接让所有卡片图片完整显示 */
+        .nation-card img {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 静态预埋后台管理链接，默认隐藏，原生跳转无脚本拦截 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <h2 class="block-title">百族图谱·贵州十七世居少数民族人文档案</h2>
+    <p style="text-align:center;margin:-1rem 0 3rem;color:#666;">浏览民族基础信息、地域分布、代表民俗与传统节庆，点击卡片跳转对应民族专属节日日历</p>
+
+    <div class="nation-wrap">
+        <!-- 1苗族 -->
+        <div class="nation-card">
+            <img src="img/苗族.jpg" alt="苗族">
+            <h4>苗族</h4>
+            <p>分布：黔东南、黔南；代表节日：苗年、姊妹节、芦笙节；特色民俗：芦笙舞、苗绣</p>
+            <a href="calendar.html?nation=miao">查看苗族全部节日</a>
+        </div>
+        <!-- 2布依族 -->
+        <div class="nation-card">
+            <img src="img/布依族.jpg" alt="布依族">
+            <h4>布依族</h4>
+            <p>分布：黔南、安顺；代表节日：三月三、六月六；特色民俗：五色糯米饭、山歌对唱</p>
+            <a href="calendar.html?nation=buyi">查看布依族全部节日</a>
+        </div>
+        <!-- 3侗族 -->
+        <div class="nation-card">
+            <img src="img/侗族.jpg" alt="侗族">
+            <h4>侗族</h4>
+            <p>分布：黔东南；代表节日：萨玛节、侗年；特色民俗：侗族大歌、银饰锻造</p>
+            <a href="calendar.html?nation=dong">查看侗族全部节日</a>
+        </div>
+        <!-- 4水族 -->
+        <div class="nation-card">
+            <img src="img/水族.jpg" alt="水族">
+            <h4>水族</h4>
+            <p>分布：黔南三都；代表节日：端节、卯节；特色民俗：马尾绣、水书历法</p>
+            <a href="calendar.html?nation=shui">查看水族全部节日</a>
+        </div>
+        <!-- 5彝族 -->
+        <div class="nation-card">
+            <img src="img/彝族.jpg" alt="彝族">
+            <h4>彝族</h4>
+            <p>分布：黔西北；代表节日：火把节、彝族年；特色民俗：彝族歌舞、漆器工艺</p>
+            <a href="calendar.html?nation=yi">查看彝族全部节日</a>
+        </div>
+        <!-- 6瑶族 -->
+        <div class="nation-card">
+            <img src="img/瑶族.jpg" alt="瑶族">
+            <h4>瑶族</h4>
+            <p>分布：黔南、黔东南；代表节日：盘王节、达努节；特色民俗：瑶绣、长鼓舞</p>
+            <a href="calendar.html?nation=yao">查看瑶族全部节日</a>
+        </div>
+        <!-- 7仡佬族 -->
+        <div class="nation-card">
+            <img src="img/仡佬族.jpg" alt="仡佬族">
+            <h4>仡佬族</h4>
+            <p>分布：贵州全境；代表节日：仡佬年、敬雀节；特色民俗：吃新祭祖、打糍粑</p>
+            <a href="calendar.html?nation=gelao">查看仡佬族全部节日</a>
+        </div>
+        <!-- 8土家族 -->
+        <div class="nation-card">
+            <img src="img/土家族.jpg" alt="土家族">
+            <h4>土家族</h4>
+            <p>分布：黔东北；代表节日：摆手节、牛王节；特色民俗：摆手舞、织锦</p>
+            <a href="calendar.html?nation=tujia">查看土家族全部节日</a>
+        </div>
+        <!-- 9壮族 -->
+        <div class="nation-card">
+            <img src="img/壮族.jpg" alt="壮族">
+            <h4>壮族</h4>
+            <p>分布：黔南南部；代表节日：三月三歌圩、青蛙节；特色民俗：抛绣球、五色糯米饭</p>
+            <a href="calendar.html?nation=zhuang">查看壮族全部节日</a>
+        </div>
+        <!-- 10回族 -->
+        <div class="nation-card">
+            <img src="img/回族.jpg" alt="回族">
+            <h4>回族</h4>
+            <p>分布：全省城镇；代表节日：开斋节、古尔邦节；特色民俗：清真饮食、礼拜集会</p>
+            <a href="calendar.html?nation=hui">查看回族全部节日</a>
+        </div>
+        <!-- 11白族 -->
+        <div class="nation-card">
+            <img src="img/白族.jpg" alt="白族">
+            <h4>白族</h4>
+            <p>分布：黔西；代表节日：三月街、拜日望会；特色民俗：扎染、歌舞集市</p>
+            <a href="calendar.html?nation=bai">查看白族全部节日</a>
+        </div>
+        <!-- 12畲族 -->
+        <div class="nation-card">
+            <img src="img/畲族.jpg" alt="畲族">
+            <h4>畲族</h4>
+            <p>分布：黔东南；代表节日：乌饭节、分龙节；特色民俗：乌米饭、山歌会</p>
+            <a href="calendar.html?nation=she">查看畲族全部节日</a>
+        </div>
+        <!-- 13毛南族 -->
+        <div class="nation-card">
+            <img src="img/毛南族.jpg" alt="毛南族">
+            <h4>毛南族</h4>
+            <p>分布：黔南；代表节日：分龙节、五月庙节；特色民俗：木雕、节庆宴席</p>
+            <a href="calendar.html?nation=maonan">查看毛南族全部节日</a>
+        </div>
+        <!-- 14仫佬族 -->
+        <div class="nation-card">
+            <img src="img/仫佬族.jpg" alt="仫佬族">
+            <h4>仫佬族</h4>
+            <p>分布：黔南；代表节日：依饭节、走坡节；特色民俗：草龙舞、坡会相亲</p>
+            <a href="calendar.html?nation=mulao">查看仫佬族全部节日</a>
+        </div>
+        <!-- 15满族 -->
+        <div class="nation-card">
+            <img src="img/满族.jpg" alt="满族">
+            <h4>满族</h4>
+            <p>分布：全省散居；代表节日：颁金节、四月庙会；特色民俗：传统旗装、民俗戏曲</p>
+            <a href="calendar.html?nation=man">查看满族全部节日</a>
+        </div>
+        <!-- 16蒙古族 -->
+        <div class="nation-card">
+            <img src="img/蒙古族.jpg" alt="蒙古族">
+            <h4>蒙古族</h4>
+            <p>分布：黔西；代表节日：那达慕、鲁班节；特色民俗：摔跤、赛马、手工艺</p>
+            <a href="calendar.html?nation=mong">查看蒙古族全部节日</a>
+        </div>
+        <!-- 17羌族 -->
+        <div class="nation-card">
+            <img src="img/羌族.jpg" alt="羌族">
+            <h4>羌族</h4>
+            <p>分布：黔西北；代表节日：羌年、转山会；特色民俗：沙朗锅庄、祭祀山神</p>
+            <a href="calendar.html?nation=qiang">查看羌族全部节日</a>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    // 执行导航文字切换
+    updateLoginNav();
+
+    // 导航点击拦截校验
+    const userNavBtn = document.getElementById('userNavBtn');
+    userNavBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const loginUser = localStorage.getItem('loginUser');
+        if (!loginUser) {
+            alert('请先登录账号');
+        }
+    });
+});
+    </script>
+    <!-- 管理员导航控制JS，仅控制显示隐藏 -->
+    <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+});
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+
+</html>

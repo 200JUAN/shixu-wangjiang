@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云阙登入｜账号注册登录</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+
+        .login-box-wrap {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .tab-switch {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab-switch button {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            font-size: 16px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .tab-switch button.active {
+            color: #9c1a2c;
+            border-bottom: 2px solid #9c1a2c;
+        }
+
+        .input-item {
+            margin-bottom: 15px;
+        }
+
+        .input-item input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            margin: 15px 0;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #9c1a2c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background: #7e1423;
+        }
+
+        .error-tip {
+            font-size: 13px;
+            color: #f53f3f;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        .success-tip {
+            font-size: 13px;
+            color: #00b42a;
+            margin-bottom: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.png" alt="logo">
+            <h2>时叙万疆</h2>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+        </nav>
+    </header>
+
+    <div class="login-box-wrap">
+        <div class="tab-switch">
+            <button id="login-tab" class="active">用户登录</button>
+            <button id="reg-tab">账号注册</button>
+        </div>
+
+        <!-- 登录表单（改为手机号登录） -->
+        <div class="login-form">
+            <div class="error-tip" id="login-error"></div>
+            <div class="success-tip" id="login-success"></div>
+            <div class="input-item">
+                <input type="text" id="login-username" placeholder="请输入注册手机号">
+            </div>
+            <div class="input-item">
+                <input type="password" id="login-pwd" placeholder="请输入登录密码">
+            </div>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="user-type" value="user" checked> 普通游客用户
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="user-type" value="admin"> 后台管理员
+                </label>
+            </div>
+            <button class="submit-btn" id="login-submit">登入系统</button>
+        </div>
+
+        <!-- 注册表单 -->
+        <div class="reg-form hidden">
+            <div class="input-item">
+                <input type="text" id="reg-name" placeholder="设置昵称（2-20位）">
+            </div>
+            <div class="input-item">
+                <input type="password" id="reg-pwd" placeholder="设置登录密码（至少6位）">
+            </div>
+            <div class="input-item">
+                <input type="tel" id="reg-phone" placeholder="手机号码（11位）">
+            </div>
+            <div class="input-item">
+                <input type="email" id="reg-email" placeholder="绑定邮箱">
+            </div>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="reg-type" value="user" checked> 普通游客用户
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="reg-type" value="admin"> 后台管理员
+                </label>
+            </div>
+            <button class="submit-btn" id="reg-submit">完成注册</button>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+        // 本地存储键名统一管理
+        const USER_LIST_KEY = 'userList';
+        const LOGIN_USER_KEY = 'loginUser';
+        const NOW_USER_KEY = 'nowUser';
+        // 内置固定管理员账号，无需注册
+        const ADMIN_PHONE = "13800138000";
+        const ADMIN_PWD = "admin123";
+
+        // 读取全部注册用户花名册
+        function getUserList() {
+            try {
+                const storageData = localStorage.getItem(USER_LIST_KEY);
+                if (!storageData) return [];
+                const parseData = JSON.parse(storageData);
+                return Array.isArray(parseData) ? parseData : [];
+            } catch (err) {
+                console.error('读取用户列表失败：', err);
+                return [];
+            }
+        }
+
+        // 保存用户列表到localStorage（注册核心保存函数，不会丢失）
+        function saveUserList(list) {
+            localStorage.setItem(USER_LIST_KEY, JSON.stringify(list));
+        }
+
+        // 手机号格式校验
+        function isValidPhone(phoneNum) {
+            return /^1[3-9]\d{9}$/.test(phoneNum);
+        }
+
+        // 邮箱格式校验
+        function isValidEmail(mail) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail);
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            // 执行导航文字切换
+            updateLoginNav();
+
+            // 获取页面DOM元素
+            const loginTab = document.getElementById('login-tab');
+            const regTab = document.getElementById('reg-tab');
+            const loginForm = document.querySelector('.login-form');
+            const regForm = document.querySelector('.reg-form');
+
+            const loginPhoneInput = document.getElementById('login-username');
+            const loginPwdInput = document.getElementById('login-pwd');
+            const loginBtn = document.getElementById('login-submit');
+            const errorTip = document.getElementById('login-error');
+            const successTip = document.getElementById('login-success');
+
+            const regName = document.getElementById('reg-name');
+            const regPwd = document.getElementById('reg-pwd');
+            const regPhone = document.getElementById('reg-phone');
+            const regEmail = document.getElementById('reg-email');
+            const regBtn = document.getElementById('reg-submit');
+
+            const userNavBtn = document.getElementById('userNavBtn');
+            const userTypeRadios = document.querySelectorAll('input[name="user-type"]');
+            let loginUserType = "user";
+
+            // 监听用户身份单选切换
+            userTypeRadios.forEach(radio => {
+                radio.onchange = function () {
+                    loginUserType = this.value;
+                }
+            })
+
+            // 切换登录/注册标签
+            loginTab.onclick = function () {
+                loginTab.classList.add('active');
+                regTab.classList.remove('active');
+                loginForm.classList.remove('hidden');
+                regForm.classList.add('hidden');
+                errorTip.style.display = 'none';
+                successTip.style.display = 'none';
+            };
+            regTab.onclick = function () {
+                regTab.classList.add('active');
+                loginTab.classList.remove('active');
+                regForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                errorTip.style.display = 'none';
+                successTip.style.display = 'none';
+            };
+
+            // 私藏时序页面跳转判断
+            userNavBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const loginUser = localStorage.getItem(LOGIN_USER_KEY);
+                if (loginUser) {
+                    location.href = 'user.html';
+                } else {
+                    alert('请先登录账号');
+                }
+            });
+
+            // ========== 登录逻辑：新增内置管理员账号判断 ==========
+            loginBtn.onclick = function () {
+                const phone = loginPhoneInput.value.trim();
+                const pwd = loginPwdInput.value.trim();
+                errorTip.style.display = 'none';
+                successTip.style.display = 'none';
+
+                // 空值判断
+                if (!phone || !pwd) {
+                    errorTip.innerText = '请填写手机号和登录密码';
+                    errorTip.style.display = 'block';
+                    return;
+                }
+                // 手机号格式校验
+                if (!isValidPhone(phone)) {
+                    errorTip.innerText = '手机号格式不正确，请输入11位有效号码';
+                    errorTip.style.display = 'block';
+                    return;
+                }
+
+                // 内置管理员账号匹配
+                if (phone === ADMIN_PHONE && pwd === ADMIN_PWD && loginUserType === "admin") {
+                    const adminInfo = {
+                        username: "超级管理员",
+                        password: ADMIN_PWD,
+                        phone: ADMIN_PHONE,
+                        email: "admin@shixuwanjian.com",
+                        role: "admin",
+                        collect: [],
+                        remind: []
+                    };
+                    localStorage.setItem(LOGIN_USER_KEY, adminInfo.phone);
+                    localStorage.setItem(NOW_USER_KEY, JSON.stringify(adminInfo));
+                    successTip.innerText = '管理员登录成功，正在跳转首页...';
+                    successTip.style.display = 'block';
+                    setTimeout(() => {
+                        location.href = 'index.html';
+                    }, 600);
+                    return;
+                }
+
+                const allUser = getUserList();
+                // 根据手机号查找注册用户
+                const targetUser = allUser.find(item => item.phone === phone);
+
+                if (!targetUser) {
+                    errorTip.innerText = '该手机号未注册，请先前往注册';
+                    errorTip.style.display = 'block';
+                    return;
+                }
+                if (targetUser.password !== pwd) {
+                    errorTip.innerText = '密码输入错误，请重新输入';
+                    errorTip.style.display = 'block';
+                    return;
+                }
+                // 身份校验：游客账号不能选管理员登录
+                if ((loginUserType === "admin" && targetUser.role !== "admin") || (loginUserType === "user" && targetUser.role === "admin")) {
+                    errorTip.innerText = '登录身份选择错误，请核对身份类型';
+                    errorTip.style.display = 'block';
+                    return;
+                }
+
+                // 登录成功，写入登录状态缓存
+                localStorage.setItem(LOGIN_USER_KEY, targetUser.phone);
+                localStorage.setItem(NOW_USER_KEY, JSON.stringify(targetUser));
+
+                successTip.innerText = '登录成功，正在跳转用户中心...';
+                successTip.style.display = 'block';
+                setTimeout(() => {
+                    location.href = 'user.html';
+                }, 600);
+            };
+
+            // 密码框回车快捷登录
+            loginPwdInput.addEventListener('keypress', function (ev) {
+                if (ev.key === 'Enter') loginBtn.click();
+            });
+
+            // ========== 注册逻辑：新增注册时区分管理员/游客角色 ==========
+            regBtn.onclick = function () {
+                const name = regName.value.trim();
+                const pwd = regPwd.value.trim();
+                const phone = regPhone.value.trim();
+                const email = regEmail.value.trim();
+                const regType = document.querySelector('input[name="reg-type"]:checked').value;
+
+                // 四项全部不能为空
+                if (!name || !pwd || !phone || !email) {
+                    alert('昵称、密码、手机号、邮箱四项均不能为空');
+                    return;
+                }
+                // 密码长度校验
+                if (pwd.length < 6) {
+                    alert('登录密码长度不能少于6位');
+                    return;
+                }
+                // 手机号校验
+                if (!isValidPhone(phone)) {
+                    alert('手机号格式错误，请输入11位大陆手机号');
+                    return;
+                }
+                // 邮箱校验
+                if (!isValidEmail(email)) {
+                    alert('邮箱格式错误，请输入正确邮箱地址');
+                    return;
+                }
+
+                const userArr = getUserList();
+                // 手机号唯一，不可重复注册
+                if (userArr.find(u => u.phone === phone)) {
+                    alert('该手机号已经注册过，直接登录即可');
+                    return;
+                }
+
+                // 组装新用户数据，区分角色
+                const newUser = {
+                    username: name,
+                    password: pwd,
+                    phone: phone,
+                    email: email,
+                    role: regType,
+                    collect: [],
+                    remind: []
+                };
+                userArr.push(newUser);
+                // 强制保存到userList，只要走到这里必然写入
+                saveUserList(userArr);
+
+                alert('注册成功！请使用手机号登录');
+                // 清空注册输入框
+                regName.value = '';
+                regPwd.value = '';
+                regPhone.value = '';
+                regEmail.value = '';
+                // 自动切回登录页
+                loginTab.click();
+            };
+        });
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+
+</html>

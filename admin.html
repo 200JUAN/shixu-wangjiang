@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时册后台｜管理员数据管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-wrap {width:94%;margin:2rem auto;}
+        .admin-card {border:1px solid #ddd;padding:1.5rem;border-radius:12px;margin-bottom:1.5rem;}
+        .admin-title {font-size:1.4rem;color:#7c2e2e;margin-bottom:1rem;}
+        .stat-row {display:flex;gap:1rem;flex-wrap:wrap;margin:1rem 0;}
+        .stat-item {flex:1;min-width:160px;text-align:center;padding:1rem;background:#f9f2f3;border-radius:8px;}
+        .stat-num {font-size:2rem;color:#9c1a2c;font-weight:bold;}
+        table {width:100%;border-collapse:collapse;margin-top:1rem;}
+        th,td {border:1px solid #ddd;padding:0.8rem;text-align:center;}
+        th {background:#f3e6e7;}
+        .back-btn {display:inline-block;padding:0.6rem 1.2rem;background:#9c1a2c;color:#fff;border-radius:6px;text-decoration:none;margin-bottom:1rem;}
+
+        /* 民族横向柱状图样式 */
+        .bar-h-wrap {margin-top:1rem;}
+        .bar-h-item {display:flex;align-items:center;margin:0.8rem 0;gap:0.8rem;}
+        .bar-h-name {width:180px;text-align:right;flex-shrink:0;}
+        .bar-h-bg {flex:1;height:28px;background:#eee;border-radius:14px;overflow:hidden;}
+        .bar-h-fill {height:100%;background:#9c1a2c;border-radius:14px;transition:0.3s;}
+        .bar-h-count {width:40px;text-align:left;flex-shrink:0;}
+    </style>
+</head>
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg?t=20260627" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 管理员入口，仅admin登录才显示 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <div class="admin-wrap">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> 返回首页</a>
+        <h2 class="block-title">管理员数据总览面板</h2>
+
+        <!-- 核心数据统计 -->
+        <div class="admin-card">
+            <h3 class="admin-title">平台核心数据</h3>
+            <div class="stat-row">
+                <div class="stat-item">
+                    <p>收录世居民族</p>
+                    <div class="stat-num">17</div>
+                </div>
+                <div class="stat-item">
+                    <p>收录传统节日</p>
+                    <div class="stat-num">50+</div>
+                </div>
+                <div class="stat-item">
+                    <p>用户收藏总量</p>
+                    <div class="stat-num" id="totalCollect">0</div>
+                </div>
+                <div class="stat-item">
+                    <p>AI问答生成次数</p>
+                    <div class="stat-num" id="totalAi">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 唯一图表：17民族横向柱状图 -->
+        <div class="admin-card">
+            <h3 class="admin-title">各民族节日总收藏 · 横向柱状图（完整17个民族）</h3>
+            <div class="bar-h-wrap" id="nationBarBox"></div>
+        </div>
+
+        <!-- 节日TOP20表格（50+节日只展示前20） -->
+        <div class="admin-card">
+            <h3 class="admin-title">节日收藏热度TOP20统计表（全部50+节日，仅展示前20）</h3>
+            <table>
+                <tr>
+                    <th>排名</th>
+                    <th>节日名称</th>
+                    <th>所属民族</th>
+                    <th>收藏人数</th>
+                </tr>
+                <tbody id="festTop20Table"></tbody>
+            </table>
+        </div>
+
+        <!-- 用户邮件提醒汇总（保留独立模块） -->
+        <div class="admin-card">
+            <h3 class="admin-title">用户节日邮件提醒汇总</h3>
+            <table>
+                <tr>
+                    <th>用户账号</th>
+                    <th>绑定邮箱</th>
+                    <th>预约节日</th>
+                    <th>提醒时间</th>
+                </tr>
+                <tbody id="remindTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 后台管理系统 | iCan竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    // 执行导航文字切换
+    updateLoginNav();
+
+    // 导航点击拦截校验
+    const userNavBtn = document.getElementById('userNavBtn');
+    userNavBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        const loginUser = localStorage.getItem('loginUser');
+        if (!loginUser) {
+            alert('请先登录账号');
+            location.href = "login.html";
+        }
+    });
+
+    // 管理员导航显示控制
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+
+    const userList = JSON.parse(localStorage.getItem('userList') || '[]');
+    const allCollect = [];
+    const allRemind = [];
+    let aiTotal = 0;
+
+    // 固定完整17个贵州世居民族（顺序固定，图表必定全部渲染）
+    const fullNationList = [
+        "苗族","布依族","侗族","水族","彝族","瑶族","仡佬族",
+        "土家族","壮族","回族","白族","畲族","毛南族","仫佬族",
+        "满族","蒙古族","羌族"
+    ];
+
+    // 完整50+节日映射（数字ID、文字名称双兼容）
+    const festData = [
+        {id:"1",name:"苗族苗年",nation:"苗族"},
+        {id:"2",name:"苗族姊妹节",nation:"苗族"},
+        {id:"3",name:"布依族三月三",nation:"布依族"},
+        {id:"4",name:"布依族六月六",nation:"布依族"},
+        {id:"5",name:"侗族萨玛节",nation:"侗族"},
+        {id:"6",name:"侗族侗年",nation:"侗族"},
+        {id:"7",name:"水族端节",nation:"水族"},
+        {id:"8",name:"水族卯节",nation:"水族"},
+        {id:"9",name:"彝族火把节",nation:"彝族"},
+        {id:"10",name:"彝族年",nation:"彝族"},
+        {id:"11",name:"瑶族盘王节",nation:"瑶族"},
+        {id:"12",name:"仡佬族敬雀节",nation:"仡佬族"},
+        {id:"13",name:"土家族摆手节",nation:"土家族"},
+        {id:"14",name:"壮族三月三歌圩",nation:"壮族"},
+        {id:"15",name:"回族开斋节",nation:"回族"},
+        {id:"16",name:"白族三月街",nation:"白族"},
+        {id:"17",name:"畲族乌饭节",nation:"畲族"},
+        {id:"20",name:"瑶族达努节",nation:"瑶族"},
+        {id:"独木龙舟节",name:"苗族独木龙舟节",nation:"苗族"},
+        {id:"喊天节",name:"侗族喊天节",nation:"侗族"},
+        {id:"查白歌节",name:"布依族查白歌节",nation:"布依族"},
+        {id:"三月三播种节",name:"侗族三月三播种节",nation:"侗族"},
+        {id:"鼓藏节",name:"苗族鼓藏节",nation:"苗族"},
+        {id:"毛南族分龙节",nation:"毛南族"},
+        {id:"仫佬族依饭节",nation:"仫佬族"},
+        {id:"满族颁金节",nation:"满族"},
+        {id:"蒙古族那达慕",nation:"蒙古族"},
+        {id:"羌族羌年",nation:"羌族"},
+        {id:"18",name:"仡佬族吃新节",nation:"仡佬族"},
+        {id:"19",name:"土家族牛王节",nation:"土家族"},
+        {id:"21",name:"回族古尔邦节",nation:"回族"},
+        {id:"22",name:"白族火把节",nation:"白族"},
+        {id:"23",name:"畲族分龙节",nation:"畲族"},
+        {id:"24",name:"壮族蛙婆节",nation:"壮族"},
+        {id:"25",name:"毛南族五月庙节",nation:"毛南族"},
+        {id:"26",name:"仫佬族走坡节",nation:"仫佬族"},
+        {id:"27",name:"满族四月庙会",nation:"满族"},
+        {id:"28",name:"蒙古族鲁班节",nation:"蒙古族"},
+        {id:"29",name:"羌族转山会",nation:"羌族"},
+        {id:"30",name:"苗族跳花节",nation:"苗族"},
+        {id:"31",name:"布依族查白歌节",nation:"布依族"},
+        {id:"32",name:"侗族吃新节",nation:"侗族"},
+        {id:"33",name:"水族额节",nation:"水族"},
+        {id:"34",name:"彝族插花节",nation:"彝族"},
+        {id:"35",name:"瑶族达努节",nation:"瑶族"},
+        {id:"36",name:"仡佬族牛王节",nation:"仡佬族"},
+        {id:"37",name:"土家族四月八",nation:"土家族"},
+        {id:"38",name:"壮族尝新节",nation:"壮族"},
+        {id:"39",name:"回族圣纪节",nation:"回族"},
+        {id:"40",name:"白族绕三灵",nation:"白族"},
+        {id:"41",name:"畲族三月三",nation:"畲族"},
+        {id:"42",name:"毛南族肥套",nation:"毛南族"},
+        {id:"43",name:"仫佬族春社",nation:"仫佬族"},
+        {id:"44",name:"满族龙抬头",nation:"满族"},
+        {id:"45",name:"蒙古族祭山节",nation:"蒙古族"},
+        {id:"46",name:"羌族瓦尔俄足节",nation:"羌族"},
+        {id:"47",name:"苗族四月八",nation:"苗族"},
+        {id:"48",name:"布依族七月半",nation:"布依族"},
+        {id:"49",name:"侗族冬至节",nation:"侗族"},
+        {id:"50",name:"水族铜鼓节",nation:"水族"}
+    ];
+
+    // 统计用户收藏、AI问答、提醒数据
+    userList.forEach(user => {
+        // AI问答总次数
+        const chatHis = JSON.parse(localStorage.getItem('ai_nation_chat_history') || '[]');
+        aiTotal += chatHis.filter(item => item.sender === "user").length;
+
+        // 合并节日收藏计数
+        if (Array.isArray(user.collect)) {
+            user.collect.forEach(fid => {
+                const fidStr = String(fid);
+                const exist = allCollect.find(item => item.id === fidStr);
+                if (exist) exist.count += 1;
+                else allCollect.push({ id: fidStr, count: 1 });
+            });
+        }
+
+        // 收集邮件提醒数据
+        if (Array.isArray(user.remind)) {
+            user.remind.forEach(r => {
+                allRemind.push({
+                    username: user.username,
+                    email: user.email,
+                    festName: r.name,
+                    time: `${r.remindDay}天前 ${r.remindTime}`
+                });
+            });
+        }
+    });
+
+    // 填充顶部总统计数字
+    document.getElementById('totalCollect').innerText = allCollect.reduce((sum,item)=>sum+item.count,0);
+    document.getElementById('totalAi').innerText = aiTotal;
+
+    // ---------------------- 1、17民族横向柱状图（固定全部17个，无收藏=0宽度） ----------------------
+    // 初始化17个民族收藏总数为0
+    const nationTotalMap = {};
+    fullNationList.forEach(name => nationTotalMap[name] = 0);
+    // 累加收藏
+    allCollect.forEach(item=>{
+        let fest = festData.find(f=>f.id === item.id);
+        if(!fest) fest = festData.find(f=>f.name.includes(item.id));
+        const nation = fest ? fest.nation : "未知民族";
+        if(nationTotalMap[nation] !== undefined) nationTotalMap[nation] += item.count;
+    });
+    // 计算最大收藏值，用于条形比例
+    const maxNationNum = Math.max(...Object.values(nationTotalMap));
+    const nationBarBox = document.getElementById('nationBarBox');
+    nationBarBox.innerHTML = "";
+    // 按固定17民族顺序渲染，不会缺失
+    fullNationList.forEach(nation=>{
+        const num = nationTotalMap[nation];
+        const widthPct = maxNationNum === 0 ? 0 : (num / maxNationNum) * 100;
+        nationBarBox.innerHTML += `
+            <div class="bar-h-item">
+                <div class="bar-h-name">${nation}</div>
+                <div class="bar-h-bg">
+                    <div class="bar-h-fill" style="width:${widthPct}%"></div>
+                </div>
+                <div class="bar-h-count">${num}</div>
+            </div>
+        `;
+    });
+
+    // ---------------------- 2、节日TOP20表格（50+节日只展示前20） ----------------------
+    // 节日收藏从高到低排序
+    allCollect.sort((a,b)=>b.count - a.count);
+    // 截取前20条
+    const top20Fest = allCollect.slice(0,20);
+    const festTbody = document.getElementById('festTop20Table');
+    festTbody.innerHTML = "";
+    top20Fest.forEach((item,idx)=>{
+        let fest = festData.find(f=>f.id === item.id);
+        if(!fest) fest = festData.find(f=>f.name.includes(item.id));
+        if(!fest) fest = {name:`节日ID${item.id}（未收录）`,nation:"未知民族"};
+        festTbody.innerHTML += `<tr><td>${idx+1}</td><td>${fest.name}</td><td>${fest.nation}</td><td>${item.count}</td></tr>`;
+    });
+
+    // ---------------------- 3、用户邮件提醒表格 ----------------------
+    const remindTbody = document.getElementById('remindTable');
+    remindTbody.innerHTML = "";
+    allRemind.forEach(r=>{
+        remindTbody.innerHTML += `<tr><td>${r.username}</td><td>${r.email}</td><td>${r.festName}</td><td>${r.time}</td></tr>`;
+    });
+});
+    </script>
+</body>
+</html>

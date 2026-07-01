@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI民族助手 - 全屏聊天</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .full-chat-box {
+            width: 92%;
+            margin: 40px auto;
+            height: 750px;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+        }
+        .full-chat-title {
+            background: #9c1a2c;
+            color: white;
+            padding: 14px 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .full-chat-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+        .full-input-area {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+        .full-input-area input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .full-input-area button {
+            background: #9c1a2c;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .full-msg-user {
+            background: #f8e9eb;
+            max-width: 80%;
+            margin-left: auto;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .full-msg-bot {
+            background: #eef2f5;
+            max-width: 80%;
+            margin-right: auto;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 全站统一导航栏 -->
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.png" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <!-- AI导航下拉菜单 -->
+            <div class="nav-dropdown">
+                <a href="ai-chat.html" class="drop-main active">AI民族助手 ▾</a>
+                <div class="drop-menu">
+                    <div class="drop-item" id="openFloatWin">打开AI悬浮窗口</div>
+                </div>
+            </div>
+            <a href="login.html" id="login-btn">私藏时序</a>
+        </nav>
+    </header>
+
+    <!-- 全屏大聊天界面 -->
+    <div class="full-chat-box">
+        <div class="full-chat-title">AI民族助手 · 全屏对话</div>
+        <div class="full-chat-content" id="fullChatBox">
+            <div class="full-msg-bot">你好！这里是全屏AI民族助手，可咨询贵州少数民族非遗、节日相关问题。</div>
+        </div>
+        <div class="full-input-area">
+            <input type="text" id="fullInput" placeholder="输入民族/节日/非遗问题">
+            <button id="fullSendBtn">发送提问</button>
+        </div>
+    </div>
+
+    <!-- 全局悬浮窗口DOM（必须保留，实现切页不消失） -->
+    <div class="ai-float-container" id="aiFloatWin">
+        <div class="ai-drag-header" id="aiDragBar">
+            <span class="ai-header-title">AI民族助手</span>
+            <div class="ai-header-buttons">
+                <button id="aiMinBtn">−</button>
+                <button id="aiCloseBtn">×</button>
+            </div>
+        </div>
+        <div class="ai-chat-content" id="aiChatBox"></div>
+        <div class="ai-chat-input-area">
+            <input type="text" class="ai-chat-input" id="aiInput" placeholder="输入民族/节日/非遗问题...">
+            <label class="ai-upload-label">
+                <input type="file" id="ai-file-input" accept="image/*">
+                上传图片
+            </label>
+            <button class="ai-btn" id="aiSendBtn">发送</button>
+            <button class="ai-btn" id="aiClearBtn" style="background:#666;">清空记录</button>
+        </div>
+    </div>
+    <!-- 引入全局AI脚本 -->
+    <script src="js/ai-float.js"></script>
+
+    <!-- 全屏页面简易发送逻辑（可选，和悬浮窗共用接口） -->
+    <script>
+        const fullChatBox = document.getElementById('fullChatBox');
+        const fullInput = document.getElementById('fullInput');
+        const fullSendBtn = document.getElementById('fullSendBtn');
+        const PROXY_API = "https://guizhouai-proxy-stsixnhyev.cn-hangzhou.fcapp.run/api/ai-chat";
+
+        function addFullMsg(text, isUser) {
+            const div = document.createElement('div');
+            div.className = isUser ? "full-msg-user" : "full-msg-bot";
+            div.textContent = text;
+            fullChatBox.appendChild(div);
+            fullChatBox.scrollTop = fullChatBox.scrollHeight;
+        }
+        async function fullSend() {
+            const text = fullInput.value.trim();
+            if(!text) return;
+            addFullMsg(text, true);
+            fullInput.value = "";
+            try {
+                const res = await fetch(PROXY_API, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({prompt:text})
+                });
+                const data = await res.json();
+                addFullMsg(data.answer, false);
+            }catch(err){
+                addFullMsg("调用异常，请检查网络与后端", false);
+            }
+        }
+        fullSendBtn.addEventListener("click", fullSend);
+        fullInput.addEventListener("keydown", e=>e.key==="Enter"&&fullSend());
+    </script>
+</body>
+</html>

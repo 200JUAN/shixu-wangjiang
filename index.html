@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>疆首｜时叙万疆</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <header class="nav-bar">
+        <div class="logo">
+            <img src="img/icon_calendar.jpg" alt="日历图标" class="logo-icon">
+            <span>时叙万疆</span>
+        </div>
+
+        <nav class="nav-list">
+            <a href="index.html">疆首首页</a>
+            <a href="calendar.html">时序历馆</a>
+            <a href="nation.html">百族图谱</a>
+            <a href="culture.html">风物叙录</a>
+            <a href="ai-chat.html">AI民族助手</a>
+            <a href="#" id="userNavBtn"></a>
+            <!-- 静态预埋后台管理链接，默认隐藏，原生跳转无脚本拦截 -->
+            <a href="admin.html" id="admin-nav" style="display: none;">时册后台</a>
+        </nav>
+    </header>
+
+    <!-- 3D立体分层堆叠轮播（京剧同款叠放立体效果） -->
+    <section class="banner-box">
+        <div class="carousel-wrap">
+            <div class="carousel-list" id="carouselList">
+                <!-- 第1张：全景主海报 -->
+                <div class="carousel-item">
+                    <img src="img/banner_main.jpg" alt="贵州多民族节日全景海报">
+                    <div class="item-text">
+                        <h2>万疆岁盛</h2>
+                        <p>循岁月时序，记述贵州苗、布依、侗、水、彝、瑶少数民族岁时节庆非遗文明</p>
+                        <a href="calendar.html" class="text-btn">查看全部民族节日日历</a>
+                    </div>
+                </div>
+                <!-- 第2张：苗族苗年 -->
+                <div class="carousel-item">
+                    <img src="img/fest_miaonian.jpg" alt="苗族苗年盛会">
+                    <div class="item-text">
+                        <h2>苗年盛典 · 黔东南岁首大典</h2>
+                        <p>芦笙起舞，长桌宴迎客，感受苗族千年民俗年味</p>
+                        <a href="calendar.html?nation=miao" class="text-btn">了解苗族节日</a>
+                    </div>
+                </div>
+                <!-- 第3张：布依族三月三 -->
+                <div class="carousel-item">
+                    <img src="img/fest_sansan.jpg" alt="布依族三月三">
+                    <div class="item-text">
+                        <h2>三月歌会 · 布依五色糯米饭祈福</h2>
+                        <p>山间对唱山歌，祭祀山神，祈求全年风调雨顺</p>
+                        <a href="calendar.html?nation=buyi" class="text-btn">了解布依族节日</a>
+                    </div>
+                </div>
+                <!-- 第4张：侗族萨玛节 -->
+                <div class="carousel-item">
+                    <img src="img/fest_samma.jpg" alt="侗族萨玛节">
+                    <div class="item-text">
+                        <h2>萨玛大歌 · 侗族非遗吟唱</h2>
+                        <p>千人无伴奏合唱，祭祀圣母，传承侗族古老信仰</p>
+                        <a href="calendar.html?nation=dong" class="text-btn">了解侗族节日</a>
+                    </div>
+                </div>
+                <!-- 第5张：彝族火把节 -->
+                <div class="carousel-item">
+                    <img src="img/fest_huoba.jpg" alt="彝族火把节">
+                    <div class="item-text">
+                        <h2>火把流萤 · 彝家篝火祈福</h2>
+                        <p>星火铺满村寨，摔跤、对歌，奔赴夏日狂欢</p>
+                        <a href="calendar.html?nation=yi" class="text-btn">了解彝族节日</a>
+                    </div>
+                </div>
+            </div>
+            <!-- 左右切换箭头 -->
+            <button class="arrow-btn prev" id="prevBtn"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="arrow-btn next" id="nextBtn"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <!-- 底部圆点指示器 -->
+        <div class="dot-group">
+            <span class="dot active" data-num="0"></span>
+            <span class="dot" data-num="1"></span>
+            <span class="dot" data-num="2"></span>
+            <span class="dot" data-num="3"></span>
+            <span class="dot" data-num="4"></span>
+        </div>
+    </section>
+
+    <section class="soon-festival">
+        <h3 class="block-title">佳期将至</h3>
+        <div class="festival-wrap">
+            <div class="fest-card">
+                <img src="img/fest_miaonian.jpg" alt="苗族苗年">
+                <h4>苗族苗年</h4>
+                <p>农历十月 · 苗家岁首大典</p>
+            </div>
+            <div class="fest-card">
+                <img src="img/fest_sansan.jpg" alt="布依族三月三">
+                <h4>布依族三月三</h4>
+                <p>农历三月三 · 山歌祭祀盛会</p>
+            </div>
+            <div class="fest-card">
+                <img src="img/fest_samma.jpg" alt="侗族萨玛节">
+                <h4>侗族萨玛节</h4>
+                <p>春耕前后 · 侗族大歌非遗展演</p>
+            </div>
+            <div class="fest-card">
+                <img src="img/fest_duan.jpg" alt="水族端节">
+                <h4>水族端节</h4>
+                <p>水历年末 · 世界最长民族新年</p>
+            </div>
+            <div class="fest-card">
+                <img src="img/fest_huoba.jpg" alt="彝族火把节">
+                <h4>彝族火把节</h4>
+                <p>农历六月二十四 · 篝火祈福盛典</p>
+            </div>
+            <div class="fest-card">
+                <img src="img/fest_panwang.jpg" alt="瑶族盘王节">
+                <h4>瑶族盘王节</h4>
+                <p>农历十月十六 · 祭祀始祖盘瓠</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="explain-block">
+        <h3 class="block-title">项目四大核心模块</h3>
+        <div class="text-box">
+            <p><strong>时序历馆（民族大观）</strong>：多民族双历法数字日历，按民族、月份筛选节日，查看节庆完整民俗详情；</p>
+            <p><strong>百族图谱（民族档案）</strong>：贵州六大世居民族人文卡片，记载民族分布、历史、专属节庆；</p>
+            <p><strong>风物叙录（非遗瑰宝+民族百科+AI助手）</strong>：节庆非遗工艺、特色美食、民族歌舞百科，内置AI民俗问答、科普文案生成，预留图片识别功能；</p>
+            <p><strong>私藏时序（记忆馆+用户中心）</strong>：个人节日收藏、时令提醒备忘录、AI生成文案存档，管理个人账号信息。</p>
+            <p>本项目采用轻量化前后端分离模拟架构，节日数据独立JSON文件存储，LocalStorage模拟数据库，配套完整后台管理系统，可拓展ECharts数据可视化、SpringAI多模态交互功能。</p>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <p>时叙万疆 · 贵州少数民族节日日历 | iCan数字化非遗竞赛作品</p>
+    </footer>
+
+    <script>
+// 全局统一切换导航文字、跳转地址
+function updateLoginNav() {
+    const navBtn = document.getElementById('userNavBtn');
+    // 判断登录状态
+    const loginUser = localStorage.getItem("loginUser");
+    if (loginUser) {
+        // 已登录：私藏时序，跳转个人中心
+        navBtn.textContent = "私藏时序";
+        navBtn.href = "user.html";
+    } else {
+        // 未登录：云阙登入，跳转登录页
+        navBtn.textContent = "云阙登入";
+        navBtn.href = "login.html";
+    }
+}
+window.addEventListener('load', updateLoginNav);
+
+// 点击拦截校验：未登录弹窗提示，阻止跳转
+const userNavBtn = document.getElementById('userNavBtn');
+userNavBtn.addEventListener('click', function (e) {
+    const loginUser = localStorage.getItem('loginUser');
+    if (!loginUser) {
+        e.preventDefault();
+        alert('请先登录账号');
+    }
+});
+    </script>
+    <!-- 管理员导航控制JS，仅控制显示隐藏 -->
+    <script>
+window.addEventListener("DOMContentLoaded", () => {
+    const loginInfo = JSON.parse(localStorage.getItem('nowUser') || '{}');
+    const adminNav = document.getElementById("admin-nav");
+    if (loginInfo.role === "admin") {
+        adminNav.style.display = "inline-block";
+    }
+});
+    </script>
+    <script src="js/main.js"></script>
+    <script src="js/ai-float-init.js"></script>
+</body>
+
+</html>

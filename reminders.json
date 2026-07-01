@@ -1,0 +1,40 @@
+{
+  "AA": {
+    "reminds": [
+      {
+        "id": "20",
+        "name": "卯节",
+        "date": "2026-07-01",
+        "remindDay": "7",
+        "remindTime": "09:00",
+        "note": "",
+        "sent": true,
+        "createdAt": "2026-06-29 21:21:43",
+        "sentTime": "2026-06-30 14:02:36"
+      },
+      {
+        "id": "5",
+        "name": "四月八",
+        "date": "2026-05-01",
+        "remindDay": "7",
+        "remindTime": "09:00",
+        "note": "",
+        "sent": true,
+        "createdAt": "2026-06-29 21:28:19",
+        "sentTime": "2026-06-30 14:02:36"
+      },
+      {
+        "id": "4",
+        "name": "独木龙舟节",
+        "date": "2026-07-01",
+        "remindDay": "7",
+        "remindTime": "09:00",
+        "note": "",
+        "sent": true,
+        "createdAt": "2026-06-29 21:28:31",
+        "sentTime": "2026-06-30 14:02:36"
+      }
+    ],
+    "email": "2580387842@qq.com"
+  }
+}
